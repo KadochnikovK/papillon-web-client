@@ -1,24 +1,36 @@
-import logo from './logo.svg';
-import './App.css';
+import { Box, Flex, Button, Heading } from "@chakra-ui/react";
+import { useState } from "react";
+import CardsList from "./components/CardsList/CardsList";
+import SideMenu from "./components/SideMenu/SideMenu";
+import { Provider } from "./components/ui/provider";
+import theme from "./theme";
+import items from "./content/data/cartsList";
+
 
 function App() {
+  const [selection, setSelection] = useState([]);
+  const [isFull, setIsFull] = useState(true)
+
+  const hasSelection = selection.length > 0;
+  const indeterminate = hasSelection && selection.length < items.length;
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Provider theme={theme}>
+      <Flex size={"sx"}>
+        <SideMenu isFull={isFull} setIsFull={setIsFull}/>
+        <Box marginLeft={isFull ? '300px' : '80px'} padding={"8"} bg={"lightGray"} width={"100%"}>
+          {/* <Heading>Это приложение написанное с использованием Чакра УИ</Heading> */}
+          {/* <Button>Кнопка</Button> */}
+          <CardsList
+            hasSelection={hasSelection}
+            indeterminate={indeterminate}
+            selection={selection}
+            setSelection={setSelection}
+            items={items}
+          />
+        </Box>
+      </Flex>
+    </Provider>
   );
 }
 
