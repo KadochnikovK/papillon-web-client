@@ -5,6 +5,7 @@ import SideMenu from "./components/SideMenu/SideMenu";
 import { Provider } from "./components/ui/provider";
 import theme from "./theme";
 import items from "./content/data/cartsList";
+import TopMenu from "./components/TopMenu/TopMenu";
 
 
 function App() {
@@ -18,9 +19,10 @@ function App() {
     <Provider theme={theme}>
       <Flex size={"sx"}>
         <SideMenu isFull={isFull} setIsFull={setIsFull}/>
-        <Box marginLeft={isFull ? '300px' : '80px'} padding={"8"} bg={"lightGray"} width={"100%"}>
+        <Flex gap={'40px'} flexDirection={'column'} marginLeft={isFull ? '300px' : '80px'} padding={"8"} bg={"lightGray"} width={"100%"}>
           {/* <Heading>Это приложение написанное с использованием Чакра УИ</Heading> */}
           {/* <Button>Кнопка</Button> */}
+          <TopMenu />
           <CardsList
             hasSelection={hasSelection}
             indeterminate={indeterminate}
@@ -28,7 +30,7 @@ function App() {
             setSelection={setSelection}
             items={items}
           />
-        </Box>
+        </Flex>
       </Flex>
     </Provider>
   );
