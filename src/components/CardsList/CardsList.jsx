@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useEffect } from 'react'
 import {
+    Flex,
     Button,
     Table,
     ActionBar,
@@ -7,9 +8,21 @@ import {
     Kbd,
     Portal,
 } from "@chakra-ui/react";
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchPersons } from '../../features/personsList/personsListSlice'; 
+import { makeFullName } from '../../utils/stringUtils';
 
 
-function CardsList({ items, setSelection, selection, indeterminate, hasSelection }) {
+
+function CardsList({ setSelection, selection, indeterminate, hasSelection }) {
+
+    const items = useSelector(state => state.personsList.data);
+    console.log(items)
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(fetchPersons())
+    }, []) 
 
     const rows = items.map((item) => (
         <Table.Row
@@ -39,20 +52,17 @@ function CardsList({ items, setSelection, selection, indeterminate, hasSelection
                     <Checkbox.Control />
                 </Checkbox.Root>
             </Table.Cell>
-            <Table.Cell>{item.id}</Table.Cell>
-            <Table.Cell>{item.cartNumber}</Table.Cell>
-            <Table.Cell>{item.fullName}</Table.Cell>
-            <Table.Cell>{item.fingerprints}</Table.Cell>
-            <Table.Cell>{item.nationality}</Table.Cell>
+            <Table.Cell>{item.employee_id}</Table.Cell>
+            <Table.Cell>{makeFullName(item.first_name, item.last_name, item.surname)}</Table.Cell>
+            <Table.Cell>{item.title}</Table.Cell>
             <Table.Cell>{item.address}</Table.Cell>
-            <Table.Cell>{item.dateAdded}</Table.Cell>
-            <Table.Cell>{item.type}</Table.Cell>
-            <Table.Cell>{item.responsible}</Table.Cell>
+            <Table.Cell>{item.country_code}</Table.Cell>
+
         </Table.Row>
     ));
     return (
-        <>
-            <Table.Root borderRadius={'8px'}>
+        <Flex padding={'0 20px'} bg={'white'}>
+            <Table.Root borderRadius={'8px'} padding={'20px'}>
                 <Table.Header borderRadius={'8px'}>
                     <Table.Row>
                         <Table.ColumnHeader w="6">
@@ -73,15 +83,12 @@ function CardsList({ items, setSelection, selection, indeterminate, hasSelection
                                 <Checkbox.Control />
                             </Checkbox.Root>
                         </Table.ColumnHeader>
-                        <Table.ColumnHeader>№</Table.ColumnHeader>
                         <Table.ColumnHeader>Cart Number</Table.ColumnHeader>
                         <Table.ColumnHeader>Full Name</Table.ColumnHeader>
-                        <Table.ColumnHeader>Fingerprints</Table.ColumnHeader>
-                        <Table.ColumnHeader>Nationality</Table.ColumnHeader>
+                        <Table.ColumnHeader>Title</Table.ColumnHeader>
                         <Table.ColumnHeader>Address</Table.ColumnHeader>
-                        <Table.ColumnHeader>Date Added</Table.ColumnHeader>
-                        <Table.ColumnHeader>Type</Table.ColumnHeader>
-                        <Table.ColumnHeader>Responsible</Table.ColumnHeader>
+                        <Table.ColumnHeader>Country Code</Table.ColumnHeader>
+          
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>{rows}</Table.Body>
@@ -105,9 +112,9 @@ function CardsList({ items, setSelection, selection, indeterminate, hasSelection
                     </ActionBar.Positioner>
                 </Portal>
             </ActionBar.Root>
-            {/* </HStack> */}
-        </>
+      
+        </Flex>
     )
 }
 
-export default CardsList
+export default React.memo(CardsList)

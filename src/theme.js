@@ -22,6 +22,7 @@ const config = defineConfig({
     },
     tokens: {
       colors: {
+        colorPaletteFg: "#5D7285",
         red: "#F76659",
         grey: "#5D7285",
         green: "#47D16C",

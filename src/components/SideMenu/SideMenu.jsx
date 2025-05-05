@@ -1,13 +1,12 @@
 import React, { useCallback } from 'react';
-import { Flex, Text, Image, Float } from '@chakra-ui/react';
+import { Flex, Text, Image } from '@chakra-ui/react';
 import logo from '../../content/images/logo.png';
-import CustomButton from '../ui/Button/CustomButton';
-import DocumentIcon from '../../content/images/icons/Document.svg';
-import SettingIcon from '../../content/images/icons/Setting.svg';
 import ButtonList from './components/ButtonList/ButtonList';
-import LogoutIcon from '../../content/images/icons/Logout-w.svg';
+import NewCustomButton from '../ui/Button/NewCustomButton';
+import { FaGear, FaRectangleList, FaRightFromBracket, FaArrowRight , FaArrowLeft  } from "react-icons/fa6";
 
 function SideMenu({ isFull, setIsFull }) {
+
     const toggleMenu = useCallback(() => {
         setIsFull(prev => !prev);
     }, [setIsFull]);
@@ -15,6 +14,8 @@ function SideMenu({ isFull, setIsFull }) {
     const handleButtonClick = useCallback((action) => {
         console.log(`${action} clicked`);
     }, []);
+
+
 
     return (
         <Flex
@@ -27,43 +28,53 @@ function SideMenu({ isFull, setIsFull }) {
             w={isFull ? '300px' : '80px'}
             zIndex="999"
             minW={isFull ? '300px' : '80px'}
-            p={isFull ? '32px' : '32px 16px'}
+            p={isFull ? '10px 32px' : '10px 16px'}
             gap="60px"
             transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)" // Плавная анимация
             boxShadow="md"
-            // overflow="hidden" 
+        // overflow="hidden" 
         >
-            <Float 
-                offsetY="48px" 
-                // offsetX="20px" 
-                onClick={toggleMenu}
-                aria-label={isFull ? 'Collapse menu' : 'Expand menu'}
-                cursor="pointer"
-                p={2}
-                _hover={{ bg: 'gray.100' }}
-                borderRadius="md"
-                transition="transform 0.3s ease"
-                _active={{ transform: 'scale(0.95)' }}
-            >
-                {isFull ? '←' : '→'}
-            </Float>
 
+            <NewCustomButton
+
+                // offsetY="48px"
+                // offsetX="20px" 
+                handleClick={toggleMenu}
+                aria-label={isFull ? 'Collapse menu' : 'Expand menu'}
+            // cursor="pointer"
+            // p={2}
+            // _hover={{ bg: 'gray.100' }}
+            // borderRadius="md"
+            // transition="transform 0.3s ease"
+            // _active={{ transform: 'scale(0.95)' }}
+            >
+                {isFull ? <FaArrowLeft/> : <FaArrowRight />}
+            </NewCustomButton>
             <Flex alignItems="center" justifyContent={isFull ? 'start' : "center"} gap={isFull ? '10px' : ''} minH="42px">
-                <Flex 
-                    p="4px" 
-                    w="34px" 
-                    h="34px" 
-                    bg="#00A8D2" 
-                    alignItems="center" 
-                    justifyContent="center" 
-                    borderRadius="8px"
-                    flexShrink={0}
+
+                <NewCustomButton
+                    isFull={isFull}
                 >
-                    <Image src={logo} alt="Papillon logo" />
-                </Flex>
-                <Text 
-                    fontSize="lg" 
-                    color="main" 
+                    <Flex
+                        p="4px"
+                        w="34px"
+                        h="34px"
+                        bg="#00A8D2"
+                        alignItems="center"
+                        justifyContent="center"
+                        borderRadius="8px"
+                        flexShrink={0}
+                    >
+                        <Image src={logo} alt="Papillon logo" />
+                    </Flex>
+
+                    {isFull && 'Papillon'}
+                </NewCustomButton>
+
+
+                <Text
+                    fontSize="lg"
+                    color="main"
                     fontWeight="700"
                     opacity={isFull ? 1 : 0}
                     transition="opacity 0.2s ease, width 0.3s ease"
@@ -71,43 +82,39 @@ function SideMenu({ isFull, setIsFull }) {
                     overflow="hidden"
                     w={isFull ? 'auto' : '0'}
                 >
-                    Papillon
+
                 </Text>
             </Flex>
 
             <ButtonList>
-                <CustomButton 
-                    handleClick={() => handleButtonClick('Carts List')} 
-                    icon={DocumentIcon} 
-                    title="Go to the carts list" 
+                <NewCustomButton
+                    handleClick={() => handleButtonClick('Carts List')}
                     isFull={isFull}
+                    title="Go to the carts list"
                     aria-label="Carts List"
                 >
-                    Carts List
-                </CustomButton>
-                <CustomButton 
-                    handleClick={() => handleButtonClick('Settings')} 
-                    icon={SettingIcon} 
-                    title="Go to the settings" 
+                    <FaRectangleList /> {isFull && 'Carts List'}
+                </NewCustomButton>
+                <NewCustomButton
+                    handleClick={() => handleButtonClick('Settings')}
                     isFull={isFull}
+                    title="Go to the settings"
                     aria-label="Settings"
                 >
-                    Setting
-                </CustomButton>
+                    <FaGear /> {isFull && 'Setting'}
+                </NewCustomButton>
+
             </ButtonList>
 
-            <CustomButton 
-                handleClick={() => handleButtonClick('Logout')} 
-                icon={LogoutIcon} 
-                title="Logout from the system" 
-                isFull={isFull} 
-                isColor
-                aria-label="Logout"
-                mt="auto"
-                mb={4}
+            <NewCustomButton
+                handleClick={() => handleButtonClick('Logout')}
+                title="Logout from the system"
+                variant='solid'
+                bg='colorPaletteFg'
+                isFull={isFull}
             >
-                Log Out
-            </CustomButton>
+                <FaRightFromBracket /> {isFull && 'Log Out'}
+            </NewCustomButton>
         </Flex>
     );
 }

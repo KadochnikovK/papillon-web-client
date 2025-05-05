@@ -1,15 +1,19 @@
 import React from 'react'
 import { Flex } from '@chakra-ui/react'
-import CustomButton from '../ui/Button/CustomButton'
-import add from '../../content/images/icons/add.svg'
-import edit from '../../content/images/icons/create.svg'
+import NewCustomButton from '../ui/Button/NewCustomButton'
+import { FaPlus, FaPenToSquare } from "react-icons/fa6";
+
+
+
+
+
 
 function TopMenu() {
     return (
         <>
-            <Flex padding={'20px'} backgroundColor={'white'}>
-                <CustomButton icon={add}>Кнопка</CustomButton>         
-                <CustomButton icon={edit}>Кнопка</CustomButton>         
+            <Flex padding={'10px 20px'} backgroundColor={'white'} borderBottom={'1px solid #ddd'}>
+                <NewCustomButton w={'auto'} isFull={false}><FaPlus /></NewCustomButton>
+                <NewCustomButton w={'auto'} isFull={false}><FaPenToSquare /></NewCustomButton>
             </Flex>
         </>
     )

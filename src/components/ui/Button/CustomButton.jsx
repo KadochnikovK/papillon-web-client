@@ -1,30 +1,38 @@
 import React from 'react'
 import { Button, Image, Text, Box } from '@chakra-ui/react'
 
+const ICON_SIZE = "20px"
+const TRANSITION_MAIN = "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+const DELAY_STANDART = ".1s"
+const GAP_STANDART = "18px"
+const RADIUS_STANDART = "8px"
+const COLOR_MAIN = 'main'
+
+
 function CustomButton({ 
     icon, 
-    gap, 
+    gap = GAP_STANDART, 
     handleClick, 
     padding, 
-    children, 
+    children = "Click me", 
     title, 
     isFull = false, 
     isColor = false,
-    transitionDelay = '.1s'
+    transitionDelay = DELAY_STANDART
 }) {
     return (
         <Button 
             fontSize="md"
             position="relative"
-            borderRadius="8px"
-            bg={isColor ? 'main' : 'white'}
-            gap={gap || '18px'}
+            borderRadius={RADIUS_STANDART}
+            bg={isColor ? COLOR_MAIN : 'white'}
+            gap={gap}
             onClick={handleClick}
             p={padding || 2}
             title={title || ''}
             w={isFull ? '100%' : 'max-content'}
             overflow="hidden"
-            transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+            transition={TRANSITION_MAIN}
             _hover={{
                 transform: 'translateY(-2px)',
                 boxShadow: 'md'
@@ -38,17 +46,17 @@ function CustomButton({
                 alignItems="center"
                 gap={gap || '18px'}
                 transform={isFull ? 'translateX(0)' : 'translateX(calc(50% - 10px))'}
-                transition={`transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) ${transitionDelay}`}
+                transition={`${TRANSITION_MAIN} ${transitionDelay}`}
                 w="100%"
             >
                 <Image 
                     src={icon} 
-                    w="20px"
-                    h="20px"
+                    w={ICON_SIZE}
+                    h={ICON_SIZE}
                     flexShrink={0}
                 />
                 <Text 
-                    color={isColor ? 'white' : 'main'}
+                    color={isColor ? 'white' : COLOR_MAIN}
                     fontWeight="500"
                     opacity={isFull ? 1 : 0}
                     w={isFull ? 'auto' : '0'}
@@ -56,7 +64,7 @@ function CustomButton({
                     whiteSpace="nowrap"
                     transition={`opacity 0.2s ease ${transitionDelay}, width 0.3s ease ${transitionDelay}`}
                 >
-                    {children || 'click me'}
+                    {children}
                 </Text>
             </Box>
         </Button>
