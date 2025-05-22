@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import {
     Flex,
     Button,
@@ -9,62 +9,82 @@ import {
     Portal,
 } from "@chakra-ui/react";
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchPersons } from '../../features/personsList/personsListSlice'; 
+import { fetchPersons } from '../../features/personsList/personsListSlice';
 import { makeFullName } from '../../utils/stringUtils';
+import { fetchFingers, fetchEyes, fetchText } from '../../features/persone/personeSlice';
 
 
 
 function CardsList({ setSelection, selection, indeterminate, hasSelection }) {
 
-    const items = useSelector(state => state.personsList.data);
-    console.log(items)
-    const dispatch = useDispatch();
+    const [activeId, setActiveId] = useState(null);
+    const dispatch = useDispatch()
+    const personsList = useSelector(state => state.personsList.data)
+
+    const getPersoneData = (e, item) => {
+        if (e.target.tagName === 'TD') {
+            setActiveId(item.employee_id)
+            dispatch(fetchFingers(item.employee_id))
+            dispatch(fetchEyes(item.employee_id))
+            dispatch(fetchText(item.employee_id))
+        }
+    }
 
     useEffect(() => {
         dispatch(fetchPersons())
-    }, []) 
+    }, [])
 
-    const rows = items.map((item) => (
-        <Table.Row
-            key={item.id}
-            data-selected={selection.includes(item.id) ? "" : undefined}
-            onClick={(e) => { if (e.target.tagName === 'TD') {console.log('Selected cart: ', item,e.target.tagName )}}}
-            cursor={'pointer'}
-        >
-            <Table.Cell>
-                <Checkbox.Root
-                    
-                    size="sm"
-                    top="0.5"
-                    aria-label="Select row"
-                    checked={selection.includes(item.id)}
-                    onCheckedChange={(changes) => {
-                        
-                        setSelection((prev) =>
-                            changes.checked
-                                ? [...prev, item.id]
-                                : selection.filter((id) => id !== item.id)
-                        );
-                    }}
-                    
-                >
-                    <Checkbox.HiddenInput />
-                    <Checkbox.Control />
-                </Checkbox.Root>
-            </Table.Cell>
-            <Table.Cell>{item.employee_id}</Table.Cell>
-            <Table.Cell>{makeFullName(item.first_name, item.last_name, item.surname)}</Table.Cell>
-            <Table.Cell>{item.title}</Table.Cell>
-            <Table.Cell>{item.address}</Table.Cell>
-            <Table.Cell>{item.country_code}</Table.Cell>
+    const rows = useMemo(() => personsList.map((item) => {
+        const isSelected = selection.includes(item.employee_id)
+        const isActive = item.employee_id === activeId
 
-        </Table.Row>
-    ));
+        return (
+
+            <Table.Row
+                key={item.employee_id}
+                bg={isActive ? 'gold' : isSelected ? 'blue.50' : 'white'}
+                data-selected={isSelected ? "" : undefined}
+                onClick={(e) => {
+                    getPersoneData(e, item)
+                }}
+                cursor={'pointer'}
+                _hover={{ bg: isActive ? 'gold' : 'gray.50' }}
+            >
+                <Table.Cell>
+                    <Checkbox.Root
+                        size="sm"
+                        top="0.5"
+                        aria-label="Select row"
+                        checked={selection.includes(item.employee_id)}
+                        onCheckedChange={(changes) => {
+                            setSelection((prev) =>
+                                changes.checked
+                                    ? [...prev, item.employee_id]
+                                    : selection.filter((id) => id !== item.employee_id)
+                            );
+                        }}
+
+
+                    >
+                        <Checkbox.HiddenInput />
+                        <Checkbox.Control />
+                    </Checkbox.Root>
+                </Table.Cell>
+                <Table.Cell>{item.employee_id}</Table.Cell>
+                <Table.Cell>{makeFullName(item.first_name, item.last_name, item.surname)}</Table.Cell>
+                <Table.Cell>{item.title}</Table.Cell>
+                <Table.Cell>{item.address}</Table.Cell>
+                <Table.Cell>{item.country_code}</Table.Cell>
+
+            </Table.Row>
+        )
+    }), [personsList, activeId, selection]);
+
     return (
         <Flex padding={'0 20px'} bg={'white'}>
             <Table.Root borderRadius={'8px'} padding={'20px'}>
-                <Table.Header borderRadius={'8px'}>
-                    <Table.Row>
+                <Table.Header borderRadius={'8px'} position={'sticky'} top={'60px'}  zIndex={1} >
+                    <Table.Row bg={'whiteAlpha.700'} backdropFilter={'blur(10px)'} boxShadow={'0 1px 0 0 #ddd'}>
                         <Table.ColumnHeader w="6">
                             <Checkbox.Root
                                 size="sm"
@@ -75,7 +95,7 @@ function CardsList({ setSelection, selection, indeterminate, hasSelection }) {
                                 }
                                 onCheckedChange={(changes) => {
                                     setSelection(
-                                        changes.checked ? items.map((item) => item.id) : []
+                                        changes.checked ? personsList.map((item) => item.employee_id) : []
                                     );
                                 }}
                             >
@@ -88,7 +108,7 @@ function CardsList({ setSelection, selection, indeterminate, hasSelection }) {
                         <Table.ColumnHeader>Title</Table.ColumnHeader>
                         <Table.ColumnHeader>Address</Table.ColumnHeader>
                         <Table.ColumnHeader>Country Code</Table.ColumnHeader>
-          
+                                
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>{rows}</Table.Body>
@@ -112,7 +132,7 @@ function CardsList({ setSelection, selection, indeterminate, hasSelection }) {
                     </ActionBar.Positioner>
                 </Portal>
             </ActionBar.Root>
-      
+
         </Flex>
     )
 }

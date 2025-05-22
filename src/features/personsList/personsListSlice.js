@@ -11,6 +11,16 @@ export const fetchPersons = createAsyncThunk("personsList/fetchPersons", async (
   }
 });
 
+const handlePending = (state) => {
+  state.loading = true;
+  state.error = null;
+};
+
+const handleRejected = (state, action) => {
+  state.loading = false;
+  state.error = action.payload;
+};
+
 const personsListSlice = createSlice({
   name: "personsList",
   initialState: {
@@ -18,24 +28,19 @@ const personsListSlice = createSlice({
     data: [],
     error: null,
   },
-  reducers: {},
+  reducers: {  },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchPersons.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      .addCase(fetchPersons.pending, handlePending)
       .addCase(fetchPersons.fulfilled, (state, action) => {
         state.loading = false;
         state.data = action.payload;
       })
-      .addCase(fetchPersons.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      });
+      .addCase(fetchPersons.rejected, handleRejected)
+      
   },
 });
 
-export const { getData } = personsListSlice.actions;
+
 
 export default personsListSlice.reducer;

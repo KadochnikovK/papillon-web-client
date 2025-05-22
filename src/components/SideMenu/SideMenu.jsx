@@ -30,7 +30,7 @@ function SideMenu({ isFull, setIsFull }) {
             minW={isFull ? '300px' : '80px'}
             p={isFull ? '10px 32px' : '10px 16px'}
             gap="60px"
-            transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)" // Плавная анимация
+            transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)" // Плавная анимация
             boxShadow="md"
         // overflow="hidden" 
         >
@@ -77,7 +77,7 @@ function SideMenu({ isFull, setIsFull }) {
                     color="main"
                     fontWeight="700"
                     opacity={isFull ? 1 : 0}
-                    transition="opacity 0.2s ease, width 0.3s ease"
+                    transition="opacity 0.2s ease, width 0.2s ease"
                     whiteSpace="nowrap"
                     overflow="hidden"
                     w={isFull ? 'auto' : '0'}
