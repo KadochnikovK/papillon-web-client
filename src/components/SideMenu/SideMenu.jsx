@@ -88,12 +88,12 @@ function SideMenu({ isFull, setIsFull }) {
 
             <ButtonList>
                 <NewCustomButton
-                    handleClick={() => handleButtonClick('Carts List')}
+                    handleClick={() => handleButtonClick('Cards List')}
                     isFull={isFull}
-                    title="Go to the carts list"
-                    aria-label="Carts List"
+                    title="Go to the cards list"
+                    aria-label="Cards List"
                 >
-                    <FaRectangleList /> {isFull && 'Carts List'}
+                    <FaRectangleList /> {isFull && 'Cards List'}
                 </NewCustomButton>
                 <NewCustomButton
                     handleClick={() => handleButtonClick('Settings')}

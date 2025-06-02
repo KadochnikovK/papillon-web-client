@@ -1,5 +1,7 @@
-export default async function getPersons() {
-  return await fetch("http://localhost:8000/employees/", {
-    method: "GET"
-  }).then(data => data.json()).then(data => data.rows)
+export default async function getPersons(dataBase) {
+  return await fetch(`${dataBase}/employees/`, {
+    method: "GET",
+  })
+    .then((data) => data.json())
+    .then((data) => data.rows);
 }

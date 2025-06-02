@@ -12,6 +12,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchPersons } from '../../features/personsList/personsListSlice';
 import { makeFullName } from '../../utils/stringUtils';
 import { fetchFingers, fetchEyes, fetchText } from '../../features/persone/personeSlice';
+import { resetPersone } from "../../features/persone/personeSlice";
 
 
 
@@ -19,10 +20,15 @@ function CardsList({ setSelection, selection, indeterminate, hasSelection }) {
 
     const [activeId, setActiveId] = useState(null);
     const dispatch = useDispatch()
+     
+   
     const personsList = useSelector(state => state.personsList.data)
 
-    const getPersoneData = (e, item) => {
-        if (e.target.tagName === 'TD') {
+    const handleClick = (e, item) => {
+        if (item.employee_id === activeId) {
+            setActiveId(null)
+            dispatch(resetPersone())
+        } else if (e.target.tagName === 'TD') {
             setActiveId(item.employee_id)
             dispatch(fetchFingers(item.employee_id))
             dispatch(fetchEyes(item.employee_id))
@@ -30,9 +36,25 @@ function CardsList({ setSelection, selection, indeterminate, hasSelection }) {
         }
     }
 
+    // const getPersoneData = (e, item) => {
+    //     if (e.target.tagName === 'TD') {
+    //         setActiveId(item.employee_id)
+    //         dispatch(fetchFingers(item.employee_id))
+    //         dispatch(fetchEyes(item.employee_id))
+    //         dispatch(fetchText(item.employee_id))
+    //     }
+    // }
+
     useEffect(() => {
-        dispatch(fetchPersons())
+       dispatch(fetchPersons())
     }, [])
+
+    // useEffect(() => {
+    //     dispatch(fetchPersons())
+    // }, [dispatch])
+
+    // useEffect(() => {
+    //     dispatch(fetchFingers(activeId))
 
     const rows = useMemo(() => personsList.map((item) => {
         const isSelected = selection.includes(item.employee_id)
@@ -45,7 +67,7 @@ function CardsList({ setSelection, selection, indeterminate, hasSelection }) {
                 bg={isActive ? 'gold' : isSelected ? 'blue.50' : 'white'}
                 data-selected={isSelected ? "" : undefined}
                 onClick={(e) => {
-                    getPersoneData(e, item)
+                    handleClick(e, item)
                 }}
                 cursor={'pointer'}
                 _hover={{ bg: isActive ? 'gold' : 'gray.50' }}
@@ -103,7 +125,7 @@ function CardsList({ setSelection, selection, indeterminate, hasSelection }) {
                                 <Checkbox.Control />
                             </Checkbox.Root>
                         </Table.ColumnHeader>
-                        <Table.ColumnHeader>Cart Number</Table.ColumnHeader>
+                        <Table.ColumnHeader>Card Number</Table.ColumnHeader>
                         <Table.ColumnHeader>Full Name</Table.ColumnHeader>
                         <Table.ColumnHeader>Title</Table.ColumnHeader>
                         <Table.ColumnHeader>Address</Table.ColumnHeader>

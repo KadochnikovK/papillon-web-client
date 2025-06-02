@@ -1,9 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import getPersons from "./api/personsListApi";
 
-export const fetchPersons = createAsyncThunk("personsList/fetchPersons", async (_, { rejectWithValue }) => {
+export const fetchPersons = createAsyncThunk("personsList/fetchPersons", async (_, { rejectWithValue, getState }) => {
   try {
-    const data = await getPersons();
+    const state = getState();
+    const dataBase = state.settings.data?.dataBase?.url;
+    
+    const data = await getPersons(dataBase);
     return data;
   } catch (error) {
     console.error("Ошибка при попытке получить данные карт: ", error);
@@ -28,19 +31,16 @@ const personsListSlice = createSlice({
     data: [],
     error: null,
   },
-  reducers: {  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchPersons.pending, handlePending)
       .addCase(fetchPersons.fulfilled, (state, action) => {
         state.loading = false;
-        state.data = action.payload;
+        state.data = action.payload.reverse();
       })
-      .addCase(fetchPersons.rejected, handleRejected)
-      
+      .addCase(fetchPersons.rejected, handleRejected);
   },
 });
-
-
 
 export default personsListSlice.reducer;

@@ -2,11 +2,11 @@ import React from 'react'
 import { Box, Field, Input, defineStyle } from "@chakra-ui/react"
 import { flexbox } from '@chakra-ui/styled-system'
 
-function CustomInput({label, value, placeholder = ''}) {
+function CustomInput({label, value, placeholder = '', ...props}) {
     return (
         <Field.Root>
             <Box pos="relative" w="full">
-                <Input className="peer" placeholder={placeholder} value={value} onChange={() => console.log('Изменил')}/>
+                <Input className="peer" placeholder={placeholder} value={value} {...props} />
                 <Field.Label css={floatingStyles}>{label}</Field.Label>
             </Box>
         </Field.Root>
