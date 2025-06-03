@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import {
     Flex,
     Button,
@@ -8,57 +8,70 @@ import {
     Kbd,
     Portal,
 } from "@chakra-ui/react";
-import { useSelector, useDispatch } from 'react-redux';
-import { fetchPersons } from '../../features/personsList/personsListSlice';
+
 import { makeFullName } from '../../utils/stringUtils';
-import { fetchFingers, fetchEyes, fetchText } from '../../features/persone/personeSlice';
-import { resetPersone } from "../../features/persone/personeSlice";
+
+import { usePersone } from '../../hooks/usePersone';
+import { usePersonsList } from '../../hooks/usePersonsList';
 
 
 
-function CardsList({ setSelection, selection, indeterminate, hasSelection }) {
+function CardsList() {
 
-    const [activeId, setActiveId] = useState(null);
-    const dispatch = useDispatch()
-     
-   
-    const personsList = useSelector(state => state.personsList.data)
 
-    const handleClick = (e, item) => {
-        if (item.employee_id === activeId) {
-            setActiveId(null)
-            dispatch(resetPersone())
-        } else if (e.target.tagName === 'TD') {
-            setActiveId(item.employee_id)
-            dispatch(fetchFingers(item.employee_id))
-            dispatch(fetchEyes(item.employee_id))
-            dispatch(fetchText(item.employee_id))
+    const [clickTimeout, setClickTimeout] = useState(null);
+
+    const { editPersone, onResetPersone, getPersonsData } = usePersone()
+    const { personsList, activePerson, selectedPersons, hasSelected, indeterminate, fetchPersonsList, onChangeSelection, onSelectAll, onClearSelection, isItemSelected, onChangeActive } = usePersonsList()
+
+    // const personsList = useSelector(state => state.personsList.data)
+
+    const handleClick = useCallback((e, item) => {
+        console.log('activePerson', activePerson)
+        if (clickTimeout) {
+            clearTimeout(clickTimeout);
+            setClickTimeout(null);
+            return;
         }
-    }
 
-    // const getPersoneData = (e, item) => {
-    //     if (e.target.tagName === 'TD') {
-    //         setActiveId(item.employee_id)
-    //         dispatch(fetchFingers(item.employee_id))
-    //         dispatch(fetchEyes(item.employee_id))
-    //         dispatch(fetchText(item.employee_id))
-    //     }
-    // }
+        setClickTimeout(setTimeout(() => {
+            if (item.employee_id === activePerson) {
+                onChangeActive(null);
+                onResetPersone();
+            } else if (e.target.tagName === 'TD') {
+                onChangeActive(item.employee_id);
+                getPersonsData(item.employee_id);
+            }
+            setClickTimeout(null);
+        }, 200));
+
+    }, [activePerson, clickTimeout, onResetPersone, onChangeActive, getPersonsData]);
+
+    const handleDoubleClick = useCallback(async (e, item) => {
+
+        if (clickTimeout) {
+            clearTimeout(clickTimeout);
+            setClickTimeout(null);
+        }
+
+        if (e.target.tagName === 'TD') {
+            onChangeActive(item.employee_id);
+            getPersonsData(item.employee_id);
+            editPersone();
+        }
+
+    }, [clickTimeout, editPersone, getPersonsData, onChangeActive]);
+
 
     useEffect(() => {
-       dispatch(fetchPersons())
+        fetchPersonsList()
     }, [])
 
-    // useEffect(() => {
-    //     dispatch(fetchPersons())
-    // }, [dispatch])
-
-    // useEffect(() => {
-    //     dispatch(fetchFingers(activeId))
 
     const rows = useMemo(() => personsList.map((item) => {
-        const isSelected = selection.includes(item.employee_id)
-        const isActive = item.employee_id === activeId
+
+        const isSelected = isItemSelected(item.employee_id)
+        const isActive = item.employee_id === activePerson
 
         return (
 
@@ -69,6 +82,9 @@ function CardsList({ setSelection, selection, indeterminate, hasSelection }) {
                 onClick={(e) => {
                     handleClick(e, item)
                 }}
+                onDoubleClick={(e) => {
+                    handleDoubleClick(e, item)
+                }}
                 cursor={'pointer'}
                 _hover={{ bg: isActive ? 'gold' : 'gray.50' }}
             >
@@ -77,17 +93,8 @@ function CardsList({ setSelection, selection, indeterminate, hasSelection }) {
                         size="sm"
                         top="0.5"
                         aria-label="Select row"
-                        checked={selection.includes(item.employee_id)}
-                        onCheckedChange={(changes) => {
-                            setSelection((prev) =>
-                                changes.checked
-                                    ? [...prev, item.employee_id]
-                                    : selection.filter((id) => id !== item.employee_id)
-                            );
-                        }}
-
-
-                    >
+                        checked={selectedPersons.includes(item.employee_id)}
+                        onCheckedChange={(changes) => onChangeSelection(item.employee_id, changes.checked)}>
                         <Checkbox.HiddenInput />
                         <Checkbox.Control />
                     </Checkbox.Root>
@@ -98,14 +105,20 @@ function CardsList({ setSelection, selection, indeterminate, hasSelection }) {
                 <Table.Cell>{item.address}</Table.Cell>
                 <Table.Cell>{item.country_code}</Table.Cell>
 
-            </Table.Row>
+            </Table.Row >
         )
-    }), [personsList, activeId, selection]);
+    }), [personsList,
+        activePerson,
+        selectedPersons,
+        isItemSelected,
+        onChangeSelection,
+        handleClick,        // Now stable between renders
+        handleDoubleClick]);
 
     return (
         <Flex padding={'0 20px'} bg={'white'}>
             <Table.Root borderRadius={'8px'} padding={'20px'}>
-                <Table.Header borderRadius={'8px'} position={'sticky'} top={'60px'}  zIndex={1} >
+                <Table.Header borderRadius={'8px'} position={'sticky'} top={'60px'} zIndex={1} >
                     <Table.Row bg={'whiteAlpha.700'} backdropFilter={'blur(10px)'} boxShadow={'0 1px 0 0 #ddd'}>
                         <Table.ColumnHeader w="6">
                             <Checkbox.Root
@@ -113,13 +126,9 @@ function CardsList({ setSelection, selection, indeterminate, hasSelection }) {
                                 top="0.5"
                                 aria-label="Select all rows"
                                 checked={
-                                    indeterminate ? "indeterminate" : selection.length > 0
+                                    indeterminate ? "indeterminate" : selectedPersons.length > 0
                                 }
-                                onCheckedChange={(changes) => {
-                                    setSelection(
-                                        changes.checked ? personsList.map((item) => item.employee_id) : []
-                                    );
-                                }}
+                                onCheckedChange={(changes) => changes.checked ? onSelectAll() : onClearSelection()}
                             >
                                 <Checkbox.HiddenInput />
                                 <Checkbox.Control />
@@ -130,18 +139,18 @@ function CardsList({ setSelection, selection, indeterminate, hasSelection }) {
                         <Table.ColumnHeader>Title</Table.ColumnHeader>
                         <Table.ColumnHeader>Address</Table.ColumnHeader>
                         <Table.ColumnHeader>Country Code</Table.ColumnHeader>
-                                
+
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>{rows}</Table.Body>
             </Table.Root>
 
-            <ActionBar.Root open={hasSelection}>
+            <ActionBar.Root open={hasSelected}>
                 <Portal>
                     <ActionBar.Positioner>
                         <ActionBar.Content>
                             <ActionBar.SelectionTrigger>
-                                {selection.length} selected
+                                {selectedPersons.length} selected
                             </ActionBar.SelectionTrigger>
                             <ActionBar.Separator />
                             <Button variant="outline" size="sm">

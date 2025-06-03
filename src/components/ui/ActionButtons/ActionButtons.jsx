@@ -2,6 +2,8 @@
 import { Flex } from '@chakra-ui/react';
 import NewCustomButton from '../Button/NewCustomButton';
 
+
+
 export const ActionButtons = ({
     isEditing,
     hasChanges,
@@ -22,6 +24,7 @@ export const ActionButtons = ({
                 maxWidth="max-content" w="100%" handleClick={onCancel}>
                 Cancel
             </NewCustomButton>
+           
         </Flex>
     );
 };

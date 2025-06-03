@@ -28,7 +28,7 @@ export const create = createAsyncThunk("person/create", async (personData, { rej
     const dataBase = state.settings.data.dataBase.url;
     const response = await createPerson(dataBase, personData);
     console.log(response);
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Ошибка при создании персоны:", error);
     return rejectWithValue(error.message);
@@ -50,8 +50,6 @@ export const saveChanges = createAsyncThunk("person/saveChanges", async (changes
     }
 
     if (fingerprints) {
-      console.log("fingerprints", fingerprints);
-      console.log('changes', changes)
       fingerprints.forEach((fingerprint) => {
         promises.push(updateFingers(dataBase, { user_id: id, ...fingerprint }));
       });
@@ -128,7 +126,7 @@ const personeSlice = createSlice({
 
     updateFingerprint: (state, { payload }) => {
       const currentIndex = state.data.fingerprints.findIndex((fingerprint) => fingerprint.tag === payload.tag);
-      console.log('получен палец: ', payload)
+      // console.log('получен палец: ', payload)
       if (currentIndex !== -1) {
         state.data.fingerprints[currentIndex] = payload;
       } else {
@@ -140,7 +138,7 @@ const personeSlice = createSlice({
     updateMultipleFingerprints: (state, { payload }) => {
       state.data.fingerprints = [...state.data.fingerprints, ...payload];
       payload.forEach((element) => {
-        console.log('получен палец: ', element)
+        // console.log('получен палец: ', element)
         const currentIndex = state.data.fingerprints.findIndex((fingerprint) => fingerprint.tag === payload.tag);
 
         if (currentIndex !== -1) {
@@ -172,8 +170,8 @@ const personeSlice = createSlice({
       state.dirtyFields = { ...initialState.dirtyFields };
     },
     stopEditing: (state) => {
-       state.isEditing = false;
-    }
+      state.isEditing = false;
+    },
   },
   extraReducers: (builder) => {
     const handleFulfilled =
@@ -206,18 +204,7 @@ const personeSlice = createSlice({
       .addCase(create.fulfilled, (state, { payload }) => {
         state.loading = false;
         state.isEditing = false;
-        console.log("создали: ", payload);
-        console.log("person: ", state.data.text);
-        console.log("person origin: ", state.originalData.text);
-        // Обновляем состояние с данными новой персоны
-        // state.data.text = { ...textTemplate, ...payload.text };
-        // state.data.fingerprints = payload.fingerprints || [];
-        // state.data.eyes = payload.eyes || [];
-
-        // Сохраняем копию как оригинальные данные
         state.originalData = JSON.parse(JSON.stringify(state.data));
-
-        // Сбрасываем dirtyFields
         state.dirtyFields = { ...initialState.dirtyFields };
       })
       .addCase(create.rejected, handleRejected);
@@ -250,7 +237,7 @@ export const selectChangedFingerprints = createSelector([selectData, selectOrigi
 
       // Если это новый отпечаток (нет в оригинале)
       if (!originalFinger) {
-        changes.push(currentFinger) ;
+        changes.push(currentFinger);
       }
       // Если отпечаток был изменен
       else if (JSON.stringify(currentFinger.img_png) !== JSON.stringify(originalFinger.img_png)) {
@@ -278,12 +265,12 @@ export const selectChangedFingerprints = createSelector([selectData, selectOrigi
 // });
 
 export const selectHasTextChanges = createSelector([selectChangedTextFields], (changes) => {
-  console.log("selectHasTextChanges!!!!!!!!!!!", changes);
+  // console.log("selectHasTextChanges!!!!!!!!!!!", changes);
   return Object.keys(changes).length > 0;
 });
 
 export const selectHasFingerprintsChanges = createSelector([selectChangedFingerprints], (changes) => {
-  console.log("selectHasFingerprintsChanges!!!!!!!!!!!", changes);
+  // console.log("selectHasFingerprintsChanges!!!!!!!!!!!", changes);
   return Object.keys(changes).length > 0;
 });
 

@@ -11,17 +11,21 @@ import { usePersone } from '../../hooks/usePersone';
 import { useSettings } from '../../hooks/useSettings';
 import { useImageCropper } from '../../hooks/useImageCropper';
 import { useFlatbedScanner } from '../../hooks/useFlatbedScanner';
+import { usePersonsList } from '../../hooks/usePersonsList';
+
+import imagePlaceholder from '../../images/image-placeholder.svg'
 
 
-function SideMenu({ isFull }) {
-    const [imagePreview, setImagePreview] = useState(null);
+
+function SideEditPanel({ isFull }) {
+    const [imagePreview, setImagePreview] = useState(imagePlaceholder);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const { processAndCropImage } = useImageCropper()
-
-    const { persone, loading, isEditing, isExistPersone, hasChanges, changeTextField, changeFingerprint, savePersone, cancelEditingPersone } = usePersone()
-
+    const { persone, personsLoading, isEditing, hasChanges, changeTextField, changeFingerprint, savePersone, cancelEditingPersone, getPersonsData } = usePersone()
+    const { fetchPersonsList, activePerson } = usePersonsList()
     const { settings } = useSettings()
+
+    const { processAndCropImage } = useImageCropper()
 
     const {
         scanFingers,
@@ -48,11 +52,13 @@ function SideMenu({ isFull }) {
     const handleSave = async () => {
         setImagePreview(null)
         await savePersone();
+        await fetchPersonsList()
     }
 
     const handleCancel = () => {
         setImagePreview(null)
         cancelEditingPersone();
+        getPersonsData(activePerson)
     }
 
 
@@ -70,18 +76,19 @@ function SideMenu({ isFull }) {
             direction="column"
             bg={'white'}
             h="100vh"
-            p={isExistPersone ? '10px 32px' : '10px 16px'}
-            w={loading ? '0' : '100px'}
+            p={activePerson ? '10px 32px' : '10px 16px'}
+            w={personsLoading ? '0' : '100px'}
             zIndex="999"
             minW={isEditing ? `calc(100% - ${isFull ? '300px' : '80px'})` : '300px'}
-            transform={isExistPersone || isEditing ? 'translateX(0)' : 'translateX(100%)'}
+            transform={activePerson || isEditing ? 'translateX(0)' : 'translateX(100%)'}
             gap="20px"
             transition="all .2s cubic-bezier(0.4, 0, 0.2, 1);"
             boxShadow="md"
         >
-            <Heading size={'xl'}>Edit Person</Heading>
+            <Heading size={'xl'}>Edit Person
+            </Heading>
             {
-                loading
+                personsLoading
                     ?
                     <Flex justify="center" align="center" h="100vh">
                         <Spinner size="xl" />
@@ -99,8 +106,7 @@ function SideMenu({ isFull }) {
                             isEditing={isEditing}
                         />
 
-                        <Flex maxWidth="300px" minWidth={0} flexDirection={'column'} gap={'20px'}>
-
+                        <Flex maxWidth="300px" minWidth={0} flexDirection={'column'} gap={'20px'} marginTop={'8px'}>
                             <BiometricSection isEditing={isEditing}
                                 onScanFingers={handleScanFingers}
                                 setImagePreview={setImagePreview} />
@@ -108,7 +114,7 @@ function SideMenu({ isFull }) {
                     </Flex>
             }
             <ActionButtons
-                isEditing={isEditing} F
+                isEditing={isEditing}
                 hasChanges={hasChanges}
                 onSave={handleSave}
                 onCancel={handleCancel}
@@ -117,6 +123,8 @@ function SideMenu({ isFull }) {
             <Modal
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
+                onSecondaryButtonClick={handleCloseModal}
+                secondaryButtonText="Cancel"
                 title="Fingerprint Scanning"
                 isLoading={isScanning}
             >
@@ -133,4 +141,4 @@ function SideMenu({ isFull }) {
     );
 }
 
-export default React.memo(SideMenu);
+export default React.memo(SideEditPanel);

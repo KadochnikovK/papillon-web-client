@@ -3,17 +3,15 @@ import React from 'react'
 import hand from '../../../../images/hand.svg'
 import { useSelector } from 'react-redux';
 import { chooseColor } from '../../../../helpers/fingerprints'
+import imagePlaceholder from '../../../../images/image-placeholder.svg'
 
 function Hands({ setImagePreview }) {
 
     const fingerprints = useSelector(state => state.persone.data.fingerprints)
 
     const chooseImage = (tag) => {
-        console.log('Выбор изображения')
-        console.log(fingerprints)
         const image = fingerprints.find(fingerprint => fingerprint.tag == tag)
-        console.log(image.img_png)
-        setImagePreview(image.img_png)
+        setImagePreview(image ? image.img_png : imagePlaceholder)
     }
 
     return (
